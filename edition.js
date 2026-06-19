@@ -5,19 +5,22 @@
     'use strict';
 
     const LEGACY_KEY = 'sanctuary-edition-choice';
-    const VALID = ['standard', 'ai', 'connected'];
+    const VALID = ['standard'];
 
     const LABELS = {
-        standard: 'Sanctuary Model · Standard Edition',
-        ai: 'Sanctuary Model · AI Edition',
-        connected: 'Sanctuary Model · Connected Edition'
+        standard: 'Sanctuary Model · Standard Edition'
     };
+
+    function isStandardOnly() {
+        return !!(window.TARGETPROOF_MODEL && window.TARGETPROOF_MODEL.standardOnly);
+    }
 
     function usesVault() {
         return window.SanctuaryVault && SanctuaryVault.isInitialized();
     }
 
     function getEdition() {
+        if (isStandardOnly()) return 'standard';
         if (usesVault()) {
             return SanctuaryVault.getEdition();
         }
@@ -30,6 +33,7 @@
     }
 
     async function setEdition(edition) {
+        if (isStandardOnly()) edition = 'standard';
         if (!VALID.includes(edition)) return false;
         if (usesVault()) {
             return SanctuaryVault.setEdition(edition);
@@ -53,12 +57,12 @@
         return edition;
     }
 
-    function needsServer(edition) {
-        return edition === 'ai' || edition === 'connected';
+    function needsServer() {
+        return false;
     }
 
-    function needsLlm(edition) {
-        return needsServer(edition);
+    function needsLlm() {
+        return false;
     }
 
     function label(edition) {

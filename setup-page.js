@@ -1,6 +1,11 @@
 (function () {
     'use strict';
 
+    if (window.TARGETPROOF_MODEL && window.TARGETPROOF_MODEL.standardOnly) {
+        location.replace(SanctuaryVault && SanctuaryVault.isUnlocked() ? 'index.html' : 'unlock.html');
+        return;
+    }
+
     if (!SanctuaryVault.isUnlocked()) {
         location.replace('unlock.html');
         return;

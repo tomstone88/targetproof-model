@@ -12,9 +12,7 @@
 - **Family offices** and estate teams maintaining a living protection posture record
 - **Households** that want the full Sanctuary Loop without AI or external data connectors
 
-This repository ships the **Standard Edition**: guided Assistant (rule-based, no language model), full control catalog, intake, threat spectrum, recommendations, and encrypted local storage.
-
-AI and Connected editions (on-device LLM, Knowledge layer) ship on unified client USB media — households choose on first launch.
+This repository ships the **Standard Edition only**: guided Assistant (rule-based, no language model), full control catalog, intake, threat spectrum, recommendations, and encrypted local storage.
 
 ---
 
@@ -42,10 +40,9 @@ A local server opens at `http://127.0.0.1:8765/unlock.html`. **Keep the terminal
 
 ### First launch
 1. **Create a vault password** (minimum 14 characters) — encrypts the assessment in this browser.
-2. **Choose your edition** (Standard, AI, or Connected on unified USB builds).
-3. Complete **Overview** with household name and scope.
-4. Work through the **Sanctuary Loop**: Intake → Spectrum → Controls → Roadmap → Review.
-5. Use **Assistant** for guided answers from your scored data (no generative AI in Standard).
+2. Complete **Overview** with household name and scope.
+3. Work through the **Sanctuary Loop**: Intake → Spectrum → Controls → Roadmap → Review.
+4. Use **Assistant** for guided answers from your scored data.
 
 ---
 

@@ -1021,13 +1021,6 @@
         '<a href="' + catalogUrl() + '" target="_blank" rel="noopener" class="btn btn-primary">View Full Services Catalog</a></div>';
     }
 
-    function updateEditionLabel() {
-        const el = document.getElementById('data-edition-label');
-        if (!el || !window.SanctuaryEdition) return;
-        const ed = SanctuaryEdition.getEdition();
-        el.textContent = ed ? SanctuaryEdition.label(ed) : 'Not selected';
-    }
-
     function updateNavState(view) {
         document.querySelectorAll('[data-nav]').forEach(btn => {
             btn.classList.toggle('nav-active', btn.dataset.nav === view);
@@ -1083,9 +1076,7 @@
         if (view === 'spectrum') renderSpectrum();
         if (view === 'review') renderReview();
         if (view === 'setup') renderSetupLoop();
-        if (view === 'knowledge' && window.SanctuaryKnowledge) window.SanctuaryKnowledge.onTabOpen(model);
         if (view === 'assistant' && window.SanctuaryAssistant) window.SanctuaryAssistant.onTabOpen();
-        if (view === 'data') updateEditionLabel();
     }
 
     function bindMeta() {
@@ -1317,17 +1308,6 @@
         reader.readAsText(file);
     }
 
-    function loadLlmIfNeeded() {
-        const ed = window.SanctuaryEdition && SanctuaryEdition.getEdition();
-        if (ed !== 'ai' && ed !== 'connected') return;
-        if (document.querySelector('script[data-llm]')) return;
-        const s = document.createElement('script');
-        s.type = 'module';
-        s.src = 'llm.js';
-        s.dataset.llm = '1';
-        document.body.appendChild(s);
-    }
-
     async function init() {
         if (window.SanctuaryVault) {
             if (!SanctuaryVault.isInitialized() || !SanctuaryVault.isUnlocked()) {
@@ -1337,20 +1317,10 @@
             }
             await SanctuaryVault.ensureCache();
         }
-        if (window.SanctuaryEdition && !SanctuaryEdition.getEdition()) {
-            if (window.TARGETPROOF_MODEL && window.TARGETPROOF_MODEL.standardOnly) {
-                await SanctuaryEdition.setEdition('standard');
-            } else {
-                window.location.replace('setup.html');
-                document.documentElement.classList.add('redirecting');
-                return;
-            }
+        if (window.SanctuaryEdition) {
+            if (!SanctuaryEdition.getEdition()) await SanctuaryEdition.setEdition('standard');
+            SanctuaryEdition.applyEditionToDocument();
         }
-        if (window.SanctuaryEdition) SanctuaryEdition.applyEditionToDocument();
-        if (window.TARGETPROOF_MODEL && window.TARGETPROOF_MODEL.standardOnly) {
-            document.querySelectorAll('.edition-picker-only').forEach(el => el.classList.add('hidden'));
-        }
-        loadLlmIfNeeded();
         loadModelFromVault();
         bindMeta();
         renderIntake();
@@ -1359,8 +1329,6 @@
         updateStats();
         updateSaveIndicator();
         updateControlProgress();
-        updateEditionLabel();
-
         bindPortalNav();
         document.querySelectorAll('[data-nav]').forEach(btn => {
             btn.addEventListener('click', () => setView(btn.dataset.nav));

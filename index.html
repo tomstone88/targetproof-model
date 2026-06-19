@@ -241,17 +241,6 @@
         .llm-progress-wrap { margin-bottom: 0.75rem; }
         .llm-progress-wrap progress { width: 100%; height: 6px; accent-color: var(--gold); }
         .llm-progress-text { font-size: 0.75rem; color: var(--muted); margin-top: 0.35rem; }
-        html[data-edition="standard"] .ai-only,
-        html[data-edition="standard"] .connected-only { display: none !important; }
-        html[data-edition="ai"] .standard-only,
-        html[data-edition="ai"] .connected-only { display: none !important; }
-        html[data-edition="connected"] .standard-only { display: none !important; }
-        .knowledge-sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
-        .knowledge-source { background: var(--bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; }
-        .knowledge-source.active { border-color: var(--gold); }
-        .knowledge-source h3 { font-size: 0.95rem; color: white; margin: 0.35rem 0; }
-        .knowledge-source p { font-size: 0.8rem; color: var(--muted); margin: 0; }
-
         .loop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
         .loop-card { background: var(--bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; }
         .loop-card.active-phase { border-color: var(--gold); }
@@ -334,7 +323,6 @@
                     Tools
                 </button>
                 <div class="nav-menu" role="menu">
-                    <button type="button" class="connected-only" data-nav="knowledge" role="menuitem">Knowledge</button>
                     <button type="button" data-nav="assistant" role="menuitem">Assistant</button>
                     <button type="button" data-nav="data" role="menuitem">Your Data</button>
                 </div>
@@ -587,76 +575,19 @@
         <p id="review-timestamp" style="font-size:0.8rem;color:var(--muted);margin-top:1rem"></p>
     </section>
 
-    <!-- KNOWLEDGE (Connected Edition) -->
-    <section data-view="knowledge" class="hidden connected-only">
-        <div class="hero">
-            <div class="estate-label">Sanctuary · Live Knowledge</div>
-            <h1 class="serif">Household Context</h1>
-            <p>Calendar, network inventory, email, and phone — summarized locally, confirmed by you, then fed into Spectrum, Summary, and Assistant. AI Edition capabilities included.</p>
-        </div>
-        <div class="privacy-banner">
-            <strong>Read-only, on-demand.</strong> Import or connect sources you authorize. Raw messages are not stored —
-            only facts you confirm enter the model. TargetProof keeps no copy.
-        </div>
-        <div class="knowledge-sources">
-            <div class="knowledge-source active">
-                <div class="label">Available now</div>
-                <h3>Calendar</h3>
-                <p>Import .ics export → review queue → confirm travel and events.</p>
-                <label class="btn btn-primary" style="margin-top:0.75rem;cursor:pointer">
-                    Import .ics
-                    <input type="file" id="knowledge-ics-import" accept=".ics,text/calendar" style="display:none">
-                </label>
-            </div>
-            <div class="knowledge-source active">
-                <div class="label">Available now</div>
-                <h3>Network inventory</h3>
-                <p>Import sanctuary-probe manifest or nmap JSON → review queue → confirm devices and findings.</p>
-                <label class="btn btn-primary" style="margin-top:0.75rem;cursor:pointer">
-                    Import manifest
-                    <input type="file" id="knowledge-network-import" accept=".json,application/json" style="display:none">
-                </label>
-            </div>
-            <div class="knowledge-source">
-                <div class="label">Coming soon</div>
-                <h3>Email</h3>
-                <p>Read-only IMAP — wire-risk patterns, new payees, unfamiliar domains.</p>
-            </div>
-            <div class="knowledge-source">
-                <div class="label">Coming soon</div>
-                <h3>Phone</h3>
-                <p>Call log import — unknown callers, verification attempts, SMS links.</p>
-            </div>
-        </div>
-        <div class="label" style="margin-bottom:0.75rem">Review queue <span id="knowledge-status" style="color:var(--muted);font-size:0.8rem"></span></div>
-        <div id="knowledge-queue" style="margin-bottom:1.5rem"></div>
-        <div class="label" style="margin-bottom:0.75rem">Confirmed knowledge</div>
-        <div id="knowledge-facts"></div>
-    </section>
-
     <!-- ASSISTANT -->
     <section data-view="assistant" class="hidden">
         <div class="hero">
             <div class="estate-label">Sanctuary · Assistant</div>
             <h1 class="serif">Model Assistant</h1>
-            <p class="standard-only">Structured answers from your scored model — no language model, no external AI, no cloud.</p>
-            <p class="ai-only">Conversational questions about your gaps and priorities. Fully offline — your data never leaves this device.</p>
+            <p>Structured answers from your scored model — no language model, no external AI, no cloud.</p>
         </div>
-        <div class="privacy-banner standard-only">
+        <div class="privacy-banner">
             <strong>Guided assistant — no AI.</strong> The assistant reads your intake, control scores, and summary using structured, rule-based analysis.
             No language model, no inference engine, no external services. Conversation history is stored with your model on this computer.
         </div>
-        <div class="privacy-banner ai-only">
-            <strong>Local intelligence.</strong> The assistant reads your intake, control scores, and summary to answer in context.
-            A bundled AI model runs on this device via WebGPU — nothing is sent to external AI services.
-            Conversation history is stored with your model on this computer.
-        </div>
         <div class="assistant-layout">
             <div class="chat-panel">
-                <div id="assistant-llm-progress-wrap" class="llm-progress-wrap ai-only hidden no-print">
-                    <progress id="assistant-llm-progress" max="100" value="0"></progress>
-                    <div id="assistant-llm-progress-text" class="llm-progress-text">Loading AI model…</div>
-                </div>
                 <div id="assistant-suggestions" class="assistant-suggestions no-print"></div>
                 <div id="assistant-messages" class="chat-messages"></div>
                 <form id="assistant-form" class="chat-form no-print">
@@ -665,16 +596,9 @@
                 </form>
             </div>
             <aside class="assistant-side no-print">
-                <div class="card ai-only">
-                    <div class="label" style="margin-bottom:0.5rem">AI engine</div>
-                    <div id="assistant-engine-status" style="font-size:0.85rem;color:var(--dim)">
-                        <strong>Guided assistant</strong><br>
-                        <span style="font-size:0.8rem;color:var(--muted)">Checking for bundled language model…</span>
-                    </div>
-                </div>
-                <div class="card standard-only">
+                <div class="card">
                     <div class="label" style="margin-bottom:0.5rem">Assistant mode</div>
-                    <p style="font-size:0.85rem;color:var(--dim);margin:0"><strong>Guided only</strong> — structured answers from your model data. No language model on this edition.</p>
+                    <p style="font-size:0.85rem;color:var(--dim);margin:0"><strong>Guided only</strong> — structured answers from your model data. No language model, no cloud.</p>
                 </div>
                 <div class="card">
                     <div class="label" style="margin-bottom:0.5rem">Model context</div>
@@ -727,17 +651,6 @@
             <button type="button" class="btn" id="btn-lock-vault">Lock model</button>
         </div>
 
-        <div class="card edition-picker-only">
-            <div class="label">Edition</div>
-            <p style="color:var(--dim);font-size:0.9rem;margin:0 0 1rem">
-                Current: <strong id="data-edition-label" style="color:var(--cream)">—</strong>
-            </p>
-            <p style="color:var(--muted);font-size:0.85rem;margin:0 0 1rem">
-                Standard, AI, and Connected share the same assessment data. Changing edition adjusts Assistant and Knowledge features only.
-            </p>
-            <a href="setup.html?change=1" class="btn">Change edition…</a>
-        </div>
-
         <div class="card">
             <div class="label">Storage</div>
             <p style="color:var(--dim);font-size:0.9rem;margin:0">
@@ -755,16 +668,13 @@
             <img src="assets/brand/tp-icon-dk.png" alt="">
             Discretion is not a feature. It is the foundation.
         </div>
-        <div class="footer-meta standard-only">Sanctuary Model · v1.5 · Standard Edition</div>
-        <div class="footer-meta ai-only">Sanctuary Model · v1.5 · AI Edition</div>
-        <div class="footer-meta connected-only">Sanctuary Model · v1.5 · Connected Edition</div>
+        <div class="footer-meta">Sanctuary Model · v1.5 · Standard Edition</div>
     </div>
 </footer>
 
 <script src="framework.js"></script>
 <script src="catalog.js"></script>
 <script src="services.js"></script>
-<script src="knowledge.js"></script>
 <script src="assistant.js"></script>
 <script src="app.js"></script>
 </body>

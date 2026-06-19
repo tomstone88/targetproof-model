@@ -1,6 +1,4 @@
 // Sanctuary Model — runtime configuration (Family Threat Model deliverable)
-// USB unified builds: household picks edition on setup.html
-// Standard practitioner build: set standardOnly true (see publish-standard.ps1)
 window.TARGETPROOF_MODEL = window.TARGETPROOF_MODEL || {
     name: 'Sanctuary Model',
     version: '1.5',
