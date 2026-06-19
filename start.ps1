@@ -86,11 +86,36 @@ function Test-PortListening([int]$ListenPort) {
     return [bool]$conn
 }
 
+function Test-SanctuaryServerResponding([int]$ListenPort) {
+    try {
+        $r = Invoke-WebRequest -Uri "http://127.0.0.1:$ListenPort/unlock.html" -UseBasicParsing -TimeoutSec 3
+        return ($r.StatusCode -eq 200) -and ($r.Content -match 'vault|Sanctuary|TargetProof')
+    } catch {
+        return $false
+    }
+}
+
+function Open-SanctuaryApp([int]$ListenPort) {
+    $url = "http://127.0.0.1:$ListenPort/unlock.html"
+    Write-Host ""
+    Write-Host "  Sanctuary Model - TargetProof" -ForegroundColor Yellow
+    Write-Host "  Open: $url" -ForegroundColor Cyan
+    Write-Host ""
+    Start-Process $url
+}
+
 $listener = New-Object System.Net.HttpListener
 $prefix = "http://127.0.0.1:$Port/"
 $listener.Prefixes.Add($prefix)
 
 if (Test-PortListening $Port) {
+    if (Test-SanctuaryServerResponding $Port) {
+        Write-Host ""
+        Write-Host "  Sanctuary Model is already running on port $Port." -ForegroundColor Green
+        Write-Host "  Serving from another window - opening the app." -ForegroundColor DarkGray
+        Open-SanctuaryApp $Port
+        exit 0
+    }
     Stop-StaleSanctuaryServers $Port
 }
 
@@ -104,6 +129,12 @@ foreach ($attempt in 1..3) {
         $started = $true
         break
     } catch {
+        if (Test-SanctuaryServerResponding $Port) {
+            Write-Host ""
+            Write-Host "  Sanctuary Model is already running on port $Port." -ForegroundColor Green
+            Open-SanctuaryApp $Port
+            exit 0
+        }
         if ($attempt -lt 3 -and (Test-PortListening $Port)) { continue }
         Write-Host ""
         Write-Host "  Could not start server on port $Port." -ForegroundColor Red
@@ -121,17 +152,11 @@ if (-not $started) {
     exit 1
 }
 
-$url = "http://127.0.0.1:$Port/unlock.html"
-Write-Host ""
-Write-Host "  Sanctuary Model · TargetProof" -ForegroundColor Yellow
 Write-Host "  Serving from: $Root" -ForegroundColor DarkGray
-Write-Host "  Open: $url" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "  Keep this window open while using the app." -ForegroundColor White
 Write-Host "  Close this window to stop the server." -ForegroundColor DarkGray
-Write-Host ""
-
-Start-Process $url
+Open-SanctuaryApp $Port
 
 while ($listener.IsListening) {
     $ctx = $listener.GetContext()
