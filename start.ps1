@@ -57,19 +57,27 @@ function Resolve-SafeFilePath([string]$Root, [string]$RelativePath) {
 
 function Stop-StaleSanctuaryServers([int]$ListenPort) {
     $mine = $PID
-    $myStart = [System.IO.Path]::GetFullPath((Join-Path $Root 'start.ps1'))
+    $ancestors = @($mine)
+    try {
+        $p = Get-CimInstance Win32_Process -Filter "ProcessId=$mine" -ErrorAction SilentlyContinue
+        while ($p -and $p.ParentProcessId -and $p.ParentProcessId -ne 0) {
+            $ancestors += $p.ParentProcessId
+            $p = Get-CimInstance Win32_Process -Filter "ProcessId=$($p.ParentProcessId)" -ErrorAction SilentlyContinue
+        }
+    } catch {}
+
     Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
         Where-Object {
-            $_.ProcessId -ne $mine -and
+            $_.ProcessId -notin $ancestors -and
             $_.Name -eq 'powershell.exe' -and
             $_.CommandLine -and
-            ($_.CommandLine -like "*$myStart*")
+            ($_.CommandLine -match 'start\.ps1')
         } |
         ForEach-Object {
             Write-Host "  Stopping previous Sanctuary server (PID $($_.ProcessId))..." -ForegroundColor DarkGray
             Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
         }
-    Start-Sleep -Milliseconds 800
+    Start-Sleep -Milliseconds 1200
 }
 
 function Test-PortListening([int]$ListenPort) {
@@ -82,8 +90,12 @@ $listener = New-Object System.Net.HttpListener
 $prefix = "http://127.0.0.1:$Port/"
 $listener.Prefixes.Add($prefix)
 
+if (Test-PortListening $Port) {
+    Stop-StaleSanctuaryServers $Port
+}
+
 $started = $false
-foreach ($attempt in 1..2) {
+foreach ($attempt in 1..3) {
     if ($attempt -gt 1 -and (Test-PortListening $Port)) {
         Stop-StaleSanctuaryServers $Port
     }
@@ -92,10 +104,11 @@ foreach ($attempt in 1..2) {
         $started = $true
         break
     } catch {
-        if ($attempt -eq 1 -and (Test-PortListening $Port)) { continue }
+        if ($attempt -lt 3 -and (Test-PortListening $Port)) { continue }
         Write-Host ""
         Write-Host "  Could not start server on port $Port." -ForegroundColor Red
         Write-Host "  Close any other Sanctuary server window and try again." -ForegroundColor Yellow
+        Write-Host "  Or run: powershell -File start.ps1 -Port 8766" -ForegroundColor DarkGray
         Write-Host ""
         Read-Host "Press Enter to close"
         exit 1
