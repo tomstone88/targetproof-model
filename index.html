@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'">
+    <title>TargetProof Model</title>
+    <link rel="icon" href="assets/brand/favicon.ico">
+    <script src="vault.js"></script>
+    <script src="edition.js"></script>
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --bg: #0a0c14;
+            --card: #141a25;
+            --card-hover: #1a2230;
+            --border: #22283a;
+            --gold: #c5a26f;
+            --gold-hover: #d4b17d;
+            --text: #e8e0d1;
+            --muted: #8a7f68;
+            --dim: #c5b8a0;
+            --cream: #d4c9b3;
+        }
+        * { box-sizing: border-box; }
+        html.redirecting body { visibility: hidden; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            background-image: linear-gradient(rgba(10, 12, 20, 0.82), rgba(10, 12, 20, 0.92)), url('assets/brand/bg-hurricane-aerial.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: var(--text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+        .serif { font-family: Georgia, 'Times New Roman', serif; letter-spacing: -0.02em; }
+        .mono { font-family: Consolas, 'Courier New', monospace; font-size: 0.8rem; }
+        .label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+        .hidden { display: none !important; }
+
+        .stat-sep { margin: 0 0.35rem; opacity: 0.5; }
+        .gap-stat { color: #fca5a5; }
+
+        .hero { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+        .hero h1 { font-size: 2.25rem; font-weight: 600; color: white; margin: 0.5rem 0; }
+        .hero p { color: var(--dim); max-width: 40rem; margin: 0; }
+        .handoff-banner {
+            background: #0f1f17; border: 1px solid #166534;
+            border-radius: 0.75rem; padding: 1rem 1.25rem; margin-bottom: 1.5rem;
+            color: #86efac; font-size: 0.9rem;
+        }
+
+        .card {
+            background: rgba(20, 26, 37, 0.88); border: 1px solid var(--border);
+            border-radius: 1rem; padding: 1.25rem; margin-bottom: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        .card-meta { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; }
+        .card-text { color: var(--dim); margin: 0 0 0.75rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        label { display: block; margin-bottom: 0.35rem; }
+        input[type="text"], input[type="date"], textarea {
+            width: 100%; background: var(--bg); border: 1px solid var(--border);
+            border-radius: 0.6rem; padding: 0.6rem 0.85rem; color: white; font: inherit;
+        }
+        textarea { resize: vertical; min-height: 4rem; }
+        input:focus, textarea:focus { outline: 1px solid var(--gold); }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.55rem 1rem; border-radius: 0.6rem; font-size: 0.85rem;
+            cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text);
+        }
+        .btn:hover { border-color: var(--gold); }
+        .btn-primary { background: var(--gold); color: #0f0d0b; border-color: var(--gold); font-weight: 600; }
+        .btn-primary:hover { background: var(--gold-hover); }
+        .estate-label { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.65rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); }
+        .estate-label::before { content: ''; width: 1px; height: 12px; background: var(--gold); }
+        .hero-strap { max-width: 220px; height: auto; opacity: 0.85; margin-bottom: 1rem; }
+        .btn-danger { border-color: #7f1d1d; color: #fca5a5; }
+        .btn-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+
+        .checklist-layout { display: grid; grid-template-columns: 200px 1fr; gap: 1.5rem; }
+        @media (max-width: 900px) { .checklist-layout { grid-template-columns: 1fr; } }
+        .toc-sidebar { position: sticky; top: 5.5rem; align-self: start; }
+        .toc-fn { margin-bottom: 0.75rem; font-size: 0.8rem; }
+        .toc-fn-name { font-weight: 600; color: white; margin-bottom: 0.25rem; }
+        .toc-fn ul { list-style: none; padding: 0; margin: 0; }
+        .toc-fn a { color: var(--muted); text-decoration: none; display: block; padding: 0.15rem 0; }
+        .toc-fn a:hover { color: var(--gold); }
+        .toc-count { color: #4a5568; font-size: 0.7rem; }
+
+        .fn-section { margin-bottom: 2.5rem; }
+        .fn-label { font-size: 0.65rem; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; }
+        .section-title { font-size: 1.75rem; color: white; margin: 0.25rem 0 1.5rem; }
+        .cat-header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .cat-header h3 { margin: 0; color: white; font-size: 1.1rem; }
+        .cat-count { font-size: 0.75rem; color: var(--muted); }
+        .cat-desc { font-size: 0.85rem; color: var(--muted); margin: 0 0 1rem; }
+        .control-row { padding: 1rem 0; border-top: 1px solid var(--border); }
+        .control-row:first-child { border-top: none; }
+        .control-meta { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; margin-bottom: 0.5rem; }
+        .ctype { font-size: 0.7rem; color: #4a5568; }
+        .pill { font-size: 0.6rem; letter-spacing: 0.5px; padding: 0.1rem 0.4rem; border-radius: 0.25rem; border: 1px solid; text-transform: uppercase; }
+        .pill.dim { border: none; }
+        .control-statement { color: white; margin-bottom: 0.5rem; }
+        .control-service-hint { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; }
+        .control-service-hint .label { margin-right: 0.35rem; }
+        .control-details { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem; }
+        .control-details summary { cursor: pointer; color: var(--dim); }
+        .details-body { margin-top: 0.5rem; padding-left: 0.75rem; border-left: 2px solid var(--border); }
+        .status-btns { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem; }
+        .status-btn {
+            padding: 0.3rem 0.65rem; font-size: 0.75rem;
+            border: 1px solid var(--border); border-radius: 0.4rem;
+            background: var(--bg); color: var(--dim); cursor: pointer;
+        }
+        .status-btn.selected-inplace { background: #22c55e33; border-color: #22c55e; color: #86efac; }
+        .status-btn.selected-partial { background: #eab30833; border-color: #eab308; color: #fde047; }
+        .status-btn.selected-gap { background: #ef444433; border-color: #ef4444; color: #fca5a5; }
+        .status-btn.selected-na { background: #6b728033; border-color: #6b7280; color: #9ca3af; }
+        .control-note { font-size: 0.85rem; }
+
+        #search { width: 100%; max-width: 280px; margin-bottom: 1rem; }
+        #save-indicator { font-size: 0.75rem; color: var(--muted); margin-top: 1rem; }
+
+        footer {
+            border-top: 1px solid var(--border); padding: 1.75rem 1.5rem;
+            font-size: 0.75rem; color: var(--muted);
+        }
+        .footer-inner { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; text-align: center; }
+        .footer-tagline { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--dim); }
+        .footer-tagline img { width: 14px; height: 14px; opacity: 0.9; }
+        .footer-meta { color: var(--muted); }
+        #practitioner-panel {
+            max-width: 480px; margin: 1rem auto 0; text-align: left;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 0.75rem; padding: 1rem;
+        }
+        .rec-tally-banner { font-size: 1.1rem; color: var(--dim); }
+        .rec-tally-num { font-size: 1.5rem; font-weight: 600; color: white; }
+        .rec-card { margin-bottom: 1rem; }
+        .rec-card-header { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .rec-title { font-size: 1.15rem; color: white; margin: 0.25rem 0; }
+        .rec-tagline { color: var(--muted); font-size: 0.9rem; margin: 0; }
+        .rec-counts { text-align: right; font-size: 0.85rem; }
+        .rec-gap-count { color: #fca5a5; display: block; font-weight: 600; }
+        .rec-partial-count { color: #fde047; display: block; }
+        .rec-gap-list { list-style: none; padding: 0; margin: 0 0 1rem; font-size: 0.85rem; color: var(--dim); }
+        .rec-gap-list li { padding: 0.4rem 0; border-top: 1px solid var(--border); }
+        .rec-more { color: var(--muted); font-style: italic; }
+        a.btn { text-decoration: none; display: inline-flex; }
+        a.btn:hover { color: inherit; }
+        .rec-card a.btn-primary { color: #0f0d0b; }
+        .rec-card a.btn-primary:hover { color: #0f0d0b; }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+        .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; text-align: center; }
+        .stat-card .stat-num { font-size: 1.75rem; font-weight: 600; color: white; line-height: 1.2; }
+        .stat-card .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem; }
+        .stat-card.accent-green .stat-num { color: #86efac; }
+        .stat-card.accent-yellow .stat-num { color: #fde047; }
+        .stat-card.accent-red .stat-num { color: #fca5a5; }
+        .stat-card.accent-gold .stat-num { color: var(--gold); }
+
+        .maturity-grid { display: grid; gap: 0.65rem; margin-bottom: 1.5rem; }
+        .maturity-row { display: grid; grid-template-columns: 110px 1fr 48px; gap: 0.75rem; align-items: center; font-size: 0.85rem; }
+        .maturity-track { height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+        .maturity-fill { height: 100%; background: linear-gradient(90deg, #22c55e, var(--gold)); border-radius: 4px; transition: width 0.3s; }
+        .maturity-pct { color: var(--muted); font-size: 0.8rem; text-align: right; }
+
+        .dim-bars { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .dim-bar-card { flex: 1; min-width: 140px; background: var(--card); border: 1px solid var(--border); border-radius: 0.75rem; padding: 0.85rem; }
+        .dim-bar-title { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .dim-bar-counts { font-size: 0.85rem; color: var(--dim); }
+
+        .field-hint { font-size: 0.8rem; color: var(--muted); align-self: center; }
+        .summary-field-header { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .auto-badge { font-size: 0.65rem; color: var(--gold); letter-spacing: 1px; text-transform: uppercase; }
+        .stale-banner { background: #1a1520; border: 1px solid #4a3f2a; border-radius: 0.75rem; padding: 0.85rem 1rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--dim); }
+
+        .controls-toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
+        .filter-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+        .chip { padding: 0.3rem 0.7rem; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: var(--muted); cursor: pointer; }
+        .chip.chip-active { border-color: var(--gold); color: white; background: var(--card); }
+        .progress-wrap { flex: 1; min-width: 120px; max-width: 220px; }
+        .progress-track { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--gold); border-radius: 3px; }
+        .progress-label { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
+
+        .intake-section { margin-bottom: 2rem; }
+        .intake-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+        .intake-section-title { font-size: 1.1rem; color: white; font-weight: 600; margin: 0; }
+        .intake-progress { font-size: 0.75rem; color: var(--muted); }
+
+        .repeatable-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 0.75rem; }
+        .repeatable-table th { text-align: left; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--border); }
+        .repeatable-table td { padding: 0.35rem 0.5rem; vertical-align: top; }
+        .repeatable-table input, .repeatable-table select, .repeatable-table textarea { font-size: 0.85rem; padding: 0.45rem 0.6rem; }
+        .repeatable-table textarea { min-height: 2.5rem; }
+        .row-remove { background: none; border: none; color: #fca5a5; cursor: pointer; font-size: 1rem; padding: 0.25rem; }
+        .checklist-grid { display: grid; gap: 0.5rem; }
+        .check-item { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.5rem 0; }
+        .check-item input[type="checkbox"] { margin-top: 0.2rem; accent-color: var(--gold); }
+        .check-item label { color: var(--dim); font-size: 0.9rem; cursor: pointer; }
+        select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 0.6rem; padding: 0.6rem 0.85rem; color: white; font: inherit; }
+        select:focus { outline: 1px solid var(--gold); }
+
+        .assistant-layout { display: grid; grid-template-columns: 1fr 280px; gap: 1.25rem; }
+        @media (max-width: 900px) { .assistant-layout { grid-template-columns: 1fr; } }
+        .chat-panel { display: flex; flex-direction: column; min-height: 420px; }
+        .chat-messages {
+            flex: 1; overflow-y: auto; max-height: 52vh; min-height: 280px;
+            padding: 1rem; background: var(--bg); border: 1px solid var(--border);
+            border-radius: 0.75rem; margin-bottom: 1rem;
+        }
+        .chat-bubble { max-width: 92%; padding: 0.85rem 1rem; border-radius: 0.75rem; margin-bottom: 0.75rem; font-size: 0.9rem; line-height: 1.55; }
+        .chat-user { margin-left: auto; background: #1a2230; border: 1px solid var(--border); color: white; }
+        .chat-assistant { background: var(--card); border: 1px solid var(--border); color: var(--dim); }
+        .chat-form { display: flex; gap: 0.5rem; }
+        .chat-form input { flex: 1; }
+        .assistant-side .card { margin-bottom: 0.75rem; }
+        .ctx-pills { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+        .ctx-pill { font-size: 0.7rem; padding: 0.25rem 0.55rem; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); background: var(--bg); }
+        .assistant-suggestions { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1rem; }
+        .llm-progress-wrap { margin-bottom: 0.75rem; }
+        .llm-progress-wrap progress { width: 100%; height: 6px; accent-color: var(--gold); }
+        .llm-progress-text { font-size: 0.75rem; color: var(--muted); margin-top: 0.35rem; }
+        html[data-edition="standard"] .ai-only,
+        html[data-edition="standard"] .connected-only { display: none !important; }
+        html[data-edition="ai"] .standard-only,
+        html[data-edition="ai"] .connected-only { display: none !important; }
+        html[data-edition="connected"] .standard-only { display: none !important; }
+        .knowledge-sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+        .knowledge-source { background: var(--bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; }
+        .knowledge-source.active { border-color: var(--gold); }
+        .knowledge-source h3 { font-size: 0.95rem; color: white; margin: 0.35rem 0; }
+        .knowledge-source p { font-size: 0.8rem; color: var(--muted); margin: 0; }
+
+        .loop-card--clickable { cursor: pointer; transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; }
+        .loop-card--clickable:hover { transform: translateY(-3px); }
+        .loop-card--clickable:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+        .nist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; }
+        .nist-card { background: var(--bg); border: 1px solid var(--border); border-radius: 0.65rem; padding: 0.85rem; }
+        .nist-code { font-family: var(--mono); color: var(--gold); font-size: 0.75rem; }
+        .spectrum-filters { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1rem; }
+        .spectrum-card { margin-bottom: 0.75rem; }
+        .spectrum-card.relevant { border-color: var(--gold); }
+        .spectrum-meta { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.5rem 0; }
+        .spectrum-tag { font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+        .spectrum-tag.match { border-color: var(--gold); color: var(--gold); }
+        .spectrum-controls { font-size: 0.8rem; color: var(--dim); margin-top: 0.5rem; }
+        .review-scale { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0 1rem; }
+        .review-scale label { display: flex; align-items: center; gap: 0.35rem; font-size: 0.85rem; color: var(--dim); cursor: pointer; }
+
+        @media print {
+            .portal-header, nav, footer, .no-print, .toc-sidebar, .status-btns, .control-details, #search { display: none !important; }
+            body { background: white; color: #111; }
+            .card { border-color: #ddd; background: white; }
+            .section-title, .control-statement, #page-title { color: #111 !important; }
+            main { padding-top: 1rem; }
+            .category-block { break-inside: avoid; }
+        }
+    </style>
+    <link rel="stylesheet" href="assets/shell.css">
+</head>
+<body>
+
+<header class="portal-header no-print">
+    <div class="header-inner">
+        <div class="brand-lockup">
+            <img src="assets/brand/TP_Main_light_LRG.png" alt="TargetProof">
+            <span class="brand-wordmark">TargetProof <em>Model</em></span>
+        </div>
+        <nav class="portal-nav" aria-label="Model sections">
+            <button class="nav-link nav-active" data-nav="setup" type="button">
+                <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 6.5L8 2l6 4.5V14H2V6.5z"/></svg>
+                Overview
+            </button>
+            <div class="nav-group" data-nav-group="assess">
+                <button class="nav-link nav-group-btn" type="button" aria-expanded="false" aria-haspopup="true">
+                    <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/></svg>
+                    Assess
+                </button>
+                <div class="nav-menu" role="menu">
+                    <button type="button" data-nav="intake" role="menuitem">Intake</button>
+                    <button type="button" data-nav="spectrum" role="menuitem">Spectrum</button>
+                </div>
+            </div>
+            <div class="nav-group" data-nav-group="score">
+                <button class="nav-link nav-group-btn" type="button" aria-expanded="false" aria-haspopup="true">
+                    <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M3 12V8M8 12V4M13 12v-6"/></svg>
+                    Score
+                </button>
+                <div class="nav-menu" role="menu">
+                    <button type="button" data-nav="checklist" role="menuitem">Controls</button>
+                    <button type="button" data-nav="recommendations" role="menuitem">Recommendations</button>
+                </div>
+            </div>
+            <div class="nav-group" data-nav-group="deliver">
+                <button class="nav-link nav-group-btn" type="button" aria-expanded="false" aria-haspopup="true">
+                    <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M2 4h12v8H2z"/><path d="M5 8h6"/></svg>
+                    Deliver
+                </button>
+                <div class="nav-menu" role="menu">
+                    <button type="button" data-nav="summary" role="menuitem">Summary</button>
+                    <button type="button" data-nav="review" role="menuitem">Review</button>
+                </div>
+            </div>
+            <div class="nav-group" data-nav-group="tools">
+                <button class="nav-link nav-group-btn" type="button" aria-expanded="false" aria-haspopup="true">
+                    <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25"><circle cx="8" cy="8" r="2"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2"/></svg>
+                    Tools
+                </button>
+                <div class="nav-menu" role="menu">
+                    <button type="button" class="connected-only" data-nav="knowledge" role="menuitem">Knowledge</button>
+                    <button type="button" data-nav="assistant" role="menuitem">Assistant</button>
+                    <button type="button" data-nav="data" role="menuitem">Your Data</button>
+                </div>
+            </div>
+        </nav>
+        <div class="header-meta">
+            <span class="nav-client-chip is-placeholder" id="nav-household">Add household name</span>
+            <div id="header-stats"></div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- SETUP -->
+    <section data-view="setup">
+        <div class="hero hero-premium">
+            <div class="hero-badge">Diamond Tier</div>
+            <h1 class="hero-title serif" id="page-title">Your Security Model</h1>
+            <p class="hero-lead">A private family protection posture — mapped across people, institutions, and lifestyle. Discreet, on-device, and yours alone.</p>
+        </div>
+        <div id="setup-loop" class="loop-grid no-print"></div>
+
+        <div class="privacy-banner">
+            <strong>Your data stays yours.</strong> Assessment data is stored locally on this computer — TargetProof keeps no copy.
+            The app does not sync or transmit your model. Optional remediation links open targetproof.com only when you choose to follow them.
+            Export encrypted backups to a location you control.
+        </div>
+
+        <div class="card profile-card">
+            <div class="profile-card-header">
+                <div>
+                    <div class="label">Household Profile</div>
+                    <h2 class="profile-card-title" id="profile-display-name">Your household</h2>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <label class="label">Family / Household Name</label>
+                    <input type="text" id="client-name" placeholder="e.g. Stone">
+                </div>
+                <div>
+                    <label class="label">Properties in Scope</label>
+                    <input type="text" id="properties" placeholder="Primary residence, secondary…">
+                </div>
+                <div>
+                    <label class="label">Internal Owner</label>
+                    <input type="text" id="internal-owner" placeholder="Family office lead or estate manager">
+                </div>
+                <div>
+                    <label class="label">Last Updated</label>
+                    <input type="date" id="handoff-date" title="Date this model was last reviewed">
+                </div>
+            </div>
+            <p class="profile-hint">Your family office or designated owner keeps this model current. All fields save automatically.</p>
+        </div>
+    </section>
+
+    <!-- INTAKE -->
+    <section data-view="intake" class="hidden">
+        <div class="hero">
+            <div class="estate-label">TargetProof · Intake</div>
+            <h1 class="serif">Pre-Assessment Intake</h1>
+            <p>Capture context before or during the onsite assessment. Auto-saves as you type.</p>
+        </div>
+        <div id="intake-list"></div>
+    </section>
+
+    <!-- SPECTRUM -->
+    <section data-view="spectrum" class="hidden">
+        <div class="hero">
+            <div class="estate-label">TargetProof · Threat Spectrum</div>
+            <h1 class="serif">What Can Go Wrong</h1>
+            <p>Synthesized UHNWI targeting patterns, FTC fraud warnings, and NIST CSF 2.0 — mapped to your controls. Highlights patterns that match your intake.</p>
+        </div>
+        <div id="spectrum-loop" class="loop-grid no-print"></div>
+        <div class="card">
+            <div class="label" style="margin-bottom:0.75rem">NIST Cybersecurity Framework 2.0</div>
+            <p style="font-size:0.85rem;color:var(--dim);margin:0 0 1rem">Your 156 controls align to Govern → Recover. Each function below shows how the TargetProof Model applies CSF outcomes to households — not enterprise software alone.</p>
+            <div id="nist-grid" class="nist-grid"></div>
+        </div>
+        <div class="card" style="margin-top:1rem">
+            <div class="label" style="margin-bottom:0.5rem">Regulator &amp; consumer warnings (FTC-aligned)</div>
+            <p style="font-size:0.85rem;color:var(--muted);margin:0 0 1rem">Themes from FTC public guidance on impersonation, wire fraud, crypto scams, SIM swap, and data-broker exposure — adapted for family-office context.</p>
+            <div id="ftc-list"></div>
+        </div>
+        <div class="card" style="margin-top:1rem">
+            <div class="label" style="margin-bottom:0.5rem">Documented UHNWI targeting patterns</div>
+            <p style="font-size:0.85rem;color:var(--muted);margin:0 0 1rem">Synthesized from public reporting and prosecutions — not copied from any single framework. Mark patterns relevant to your household.</p>
+            <div class="spectrum-filters no-print" id="spectrum-filters">
+                <button type="button" class="chip chip-active" data-spectrum-filter="all">All</button>
+                <button type="button" class="chip" data-spectrum-filter="matched">Matches intake</button>
+                <button type="button" class="chip" data-spectrum-filter="marked">Marked relevant</button>
+            </div>
+            <div id="whale-list"></div>
+        </div>
+    </section>
+
+    <!-- CHECKLIST -->
+    <section data-view="checklist" class="hidden">
+        <div class="hero">
+            <div class="estate-label">TargetProof · 156 Controls</div>
+            <h1 class="serif">Controls Checklist</h1>
+            <p>Mark each control: <span style="color:#86efac">In Place</span> · <span style="color:#fde047">Partial</span> · <span style="color:#fca5a5">Gap</span> · <span style="color:#9ca3af">N/A</span></p>
+        </div>
+        <div class="controls-toolbar no-print">
+            <div class="filter-chips" id="control-filters">
+                <button type="button" class="chip chip-active" data-filter="all">All</button>
+                <button type="button" class="chip" data-filter="gap">Gaps</button>
+                <button type="button" class="chip" data-filter="partial">Partial</button>
+                <button type="button" class="chip" data-filter="unscored">Unscored</button>
+                <button type="button" class="chip" data-filter="inplace">In Place</button>
+            </div>
+            <div class="progress-wrap">
+                <div class="progress-track"><div class="progress-fill" id="control-progress" style="width:0%"></div></div>
+                <div class="progress-label" id="control-progress-label">0% scored</div>
+            </div>
+            <button type="button" class="btn" id="btn-next-unscored">Next unscored →</button>
+        </div>
+        <input type="search" id="search" class="no-print" placeholder="Search controls…">
+        <div class="checklist-layout">
+            <aside class="toc-sidebar no-print">
+                <div class="label" style="margin-bottom:0.75rem">Categories</div>
+                <div id="toc"></div>
+            </aside>
+            <div id="catalog"></div>
+        </div>
+    </section>
+
+    <!-- RECOMMENDATIONS -->
+    <section data-view="recommendations" class="hidden">
+        <div class="hero">
+            <div class="estate-label">TargetProof · Recommendations</div>
+            <h1 class="serif">Your Recommendations</h1>
+            <p>Gaps tallied from your control scores, mapped to TargetProof remediation services. Your model stays private — links open the website when you want to learn more.</p>
+        </div>
+        <div id="rec-summary" style="margin-bottom:1.5rem"></div>
+        <div id="recommendations-list"></div>
+    </section>
+
+    <!-- SUMMARY -->
+    <section data-view="summary" class="hidden">
+        <div class="hero">
+            <div class="estate-label">TargetProof · Assessment Report</div>
+            <h1 class="serif">Summary & Findings</h1>
+            <p>Live dashboard from your control scores. Generate a draft report, then refine each section.</p>
+        </div>
+        <div id="summary-stale-banner" class="stale-banner hidden no-print"></div>
+        <div id="summary-dashboard"></div>
+        <div class="btn-row no-print" style="margin-bottom:1.5rem">
+            <button type="button" class="btn btn-primary" id="btn-generate-summary">Generate Report from Controls</button>
+            <span id="summary-generated-label" class="field-hint"></span>
+        </div>
+        <div class="grid-2">
+            <div class="card">
+                <div class="summary-field-header">
+                    <label class="label">Critical Gaps (risk-ordered)</label>
+                    <span class="auto-badge" data-field-badge="criticalGaps"></span>
+                </div>
+                <textarea id="critical-gaps" rows="7" placeholder="Generated from gap controls, or write your own…"></textarea>
+            </div>
+            <div class="card">
+                <div class="summary-field-header">
+                    <label class="label">Threat Context & Adversary Profile</label>
+                    <span class="auto-badge" data-field-badge="threatContext"></span>
+                </div>
+                <textarea id="threat-context" rows="7" placeholder="Draws from intake history, travel, and visibility…"></textarea>
+            </div>
+            <div class="card">
+                <div class="summary-field-header">
+                    <label class="label">People Dimension</label>
+                    <span class="auto-badge" data-field-badge="people"></span>
+                </div>
+                <textarea id="summary-people" rows="6" placeholder="Gaps and partials tagged People…"></textarea>
+            </div>
+            <div class="card">
+                <div class="summary-field-header">
+                    <label class="label">Institutions Dimension</label>
+                    <span class="auto-badge" data-field-badge="institutions"></span>
+                </div>
+                <textarea id="summary-institutions" rows="6" placeholder="Gaps and partials tagged Institutions…"></textarea>
+            </div>
+        </div>
+        <div class="card" style="margin-top:1rem">
+            <div class="summary-field-header">
+                <label class="label">Lifestyle Dimension</label>
+                <span class="auto-badge" data-field-badge="lifestyle"></span>
+            </div>
+            <textarea id="summary-lifestyle" rows="5" placeholder="Gaps and partials tagged Lifestyle…"></textarea>
+        </div>
+        <div class="label" style="margin:1.5rem 0 0.75rem">Remediation Roadmap</div>
+        <div class="grid-2">
+            <div class="card">
+                <div class="summary-field-header">
+                    <label class="label">30 Days — Immediate</label>
+                    <span class="auto-badge" data-field-badge="roadmap30"></span>
+                </div>
+                <textarea id="roadmap-30" rows="5" placeholder="Protect & Detect gaps requiring urgent action…"></textarea>
+            </div>
+            <div class="card">
+                <div class="summary-field-header">
+                    <label class="label">90 Days — Foundation</label>
+                    <span class="auto-badge" data-field-badge="roadmap90"></span>
+                </div>
+                <textarea id="roadmap-90" rows="5" placeholder="Govern & Identify gaps to close next…"></textarea>
+            </div>
+        </div>
+        <div class="card" style="margin-top:1rem">
+            <div class="summary-field-header">
+                <label class="label">180 Days — Resilience</label>
+                <span class="auto-badge" data-field-badge="roadmap180"></span>
+            </div>
+            <textarea id="roadmap-180" rows="5" placeholder="Respond & Recover gaps for long-term resilience…"></textarea>
+        </div>
+    </section>
+
+    <!-- REVIEW -->
+    <section data-view="review" class="hidden">
+        <div class="hero">
+            <div class="estate-label">TargetProof · Assessment Review</div>
+            <h1 class="serif">Did We Do a Good Enough Job?</h1>
+            <p>Close the loop: effectiveness, residual risk acceptance, and what to improve next cycle — without expanding the model.</p>
+        </div>
+        <div id="review-loop" class="loop-grid no-print"></div>
+        <div id="review-dashboard" class="stat-grid" style="margin-bottom:1rem"></div>
+        <div class="grid-2">
+            <div class="card">
+                <label class="label">Was this assessment effective for your household?</label>
+                <div class="review-scale" id="review-effectiveness">
+                    <label><input type="radio" name="review-eff" value="strong"> Strong — clear priorities emerged</label>
+                    <label><input type="radio" name="review-eff" value="adequate"> Adequate — useful with gaps in process</label>
+                    <label><input type="radio" name="review-eff" value="weak"> Weak — needs a different approach</label>
+                </div>
+                <label class="label">Would you run this assessment again next year?</label>
+                <div class="review-scale" id="review-repeat">
+                    <label><input type="radio" name="review-repeat" value="yes"> Yes</label>
+                    <label><input type="radio" name="review-repeat" value="maybe"> Maybe — after improvements</label>
+                    <label><input type="radio" name="review-repeat" value="no"> No</label>
+                </div>
+                <label class="label">Would you recommend this process to a peer family or advisor?</label>
+                <div class="review-scale" id="review-recommend">
+                    <label><input type="radio" name="review-rec" value="yes"> Yes</label>
+                    <label><input type="radio" name="review-rec" value="qualified"> Yes, with caveats</label>
+                    <label><input type="radio" name="review-rec" value="no"> No</label>
+                </div>
+            </div>
+            <div class="card">
+                <label class="label" for="review-residual">Residual risk explicitly accepted</label>
+                <p style="font-size:0.8rem;color:var(--muted);margin:0 0 0.5rem">Gaps knowingly tolerated by principals — with owner and rationale (risk-centric acceptance, not neglect).</p>
+                <textarea id="review-residual" rows="6" placeholder="e.g. GV.RM-07 — secondary property camera coverage accepted until renovation…"></textarea>
+                <label class="label" for="review-improvements" style="margin-top:1rem">What should improve next cycle?</label>
+                <textarea id="review-improvements" rows="6" placeholder="Process, intake depth, staff participation, control scoring discipline…"></textarea>
+            </div>
+        </div>
+        <p id="review-timestamp" style="font-size:0.8rem;color:var(--muted);margin-top:1rem"></p>
+    </section>
+
+    <!-- KNOWLEDGE (Connected Edition) -->
+    <section data-view="knowledge" class="hidden connected-only">
+        <div class="hero">
+            <div class="estate-label">TargetProof · Live Knowledge</div>
+            <h1 class="serif">Household Context</h1>
+            <p>Calendar, network inventory, email, and phone — summarized locally, confirmed by you, then fed into Spectrum, Summary, and Assistant. AI Edition capabilities included.</p>
+        </div>
+        <div class="privacy-banner">
+            <strong>Read-only, on-demand.</strong> Import or connect sources you authorize. Raw messages are not stored —
+            only facts you confirm enter the model. TargetProof keeps no copy.
+        </div>
+        <div class="knowledge-sources">
+            <div class="knowledge-source active">
+                <div class="label">Available now</div>
+                <h3>Calendar</h3>
+                <p>Import .ics export → review queue → confirm travel and events.</p>
+                <label class="btn btn-primary" style="margin-top:0.75rem;cursor:pointer">
+                    Import .ics
+                    <input type="file" id="knowledge-ics-import" accept=".ics,text/calendar" style="display:none">
+                </label>
+            </div>
+            <div class="knowledge-source active">
+                <div class="label">Available now</div>
+                <h3>Network inventory</h3>
+                <p>Import sanctuary-probe manifest or nmap JSON → review queue → confirm devices and findings.</p>
+                <label class="btn btn-primary" style="margin-top:0.75rem;cursor:pointer">
+                    Import manifest
+                    <input type="file" id="knowledge-network-import" accept=".json,application/json" style="display:none">
+                </label>
+            </div>
+            <div class="knowledge-source">
+                <div class="label">Coming soon</div>
+                <h3>Email</h3>
+                <p>Read-only IMAP — wire-risk patterns, new payees, unfamiliar domains.</p>
+            </div>
+            <div class="knowledge-source">
+                <div class="label">Coming soon</div>
+                <h3>Phone</h3>
+                <p>Call log import — unknown callers, verification attempts, SMS links.</p>
+            </div>
+        </div>
+        <div class="label" style="margin-bottom:0.75rem">Review queue <span id="knowledge-status" style="color:var(--muted);font-size:0.8rem"></span></div>
+        <div id="knowledge-queue" style="margin-bottom:1.5rem"></div>
+        <div class="label" style="margin-bottom:0.75rem">Confirmed knowledge</div>
+        <div id="knowledge-facts"></div>
+    </section>
+
+    <!-- ASSISTANT -->
+    <section data-view="assistant" class="hidden">
+        <div class="hero">
+            <div class="estate-label">TargetProof · Private Assistant</div>
+            <h1 class="serif">Model Assistant</h1>
+            <p class="standard-only">Ask security questions informed by your household model. Guided analysis only — no AI, no external services.</p>
+            <p class="ai-only">Ask security questions informed by your household model. Runs entirely on this device — your data never leaves the USB.</p>
+        </div>
+        <div class="privacy-banner standard-only">
+            <strong>Guided assistant — no AI.</strong> The assistant reads your intake, control scores, and summary using structured, rule-based analysis.
+            No language model, no inference engine, no external services. Conversation history is stored with your model on this computer.
+        </div>
+        <div class="privacy-banner ai-only">
+            <strong>Local intelligence.</strong> The assistant reads your intake, control scores, and summary to answer in context.
+            A bundled AI model runs on this device via WebGPU — nothing is sent to external AI services.
+            Conversation history is stored with your model on this computer.
+        </div>
+        <div class="assistant-layout">
+            <div class="chat-panel">
+                <div id="assistant-llm-progress-wrap" class="llm-progress-wrap ai-only hidden no-print">
+                    <progress id="assistant-llm-progress" max="100" value="0"></progress>
+                    <div id="assistant-llm-progress-text" class="llm-progress-text">Loading AI model…</div>
+                </div>
+                <div id="assistant-suggestions" class="assistant-suggestions no-print"></div>
+                <div id="assistant-messages" class="chat-messages"></div>
+                <form id="assistant-form" class="chat-form no-print">
+                    <input type="text" id="assistant-input" placeholder="Ask about gaps, priorities, staff, travel, remediation…" autocomplete="off">
+                    <button type="submit" class="btn btn-primary">Ask</button>
+                </form>
+            </div>
+            <aside class="assistant-side no-print">
+                <div class="card ai-only">
+                    <div class="label" style="margin-bottom:0.5rem">AI engine</div>
+                    <div id="assistant-engine-status" style="font-size:0.85rem;color:var(--dim)">
+                        <strong>Guided assistant</strong><br>
+                        <span style="font-size:0.8rem;color:var(--muted)">Checking for bundled language model…</span>
+                    </div>
+                </div>
+                <div class="card standard-only">
+                    <div class="label" style="margin-bottom:0.5rem">Assistant mode</div>
+                    <p style="font-size:0.85rem;color:var(--dim);margin:0"><strong>Guided only</strong> — structured answers from your model data. No language model on this edition.</p>
+                </div>
+                <div class="card">
+                    <div class="label" style="margin-bottom:0.5rem">Model context</div>
+                    <div id="assistant-context" class="ctx-pills"></div>
+                    <p style="font-size:0.8rem;color:var(--muted);margin:0.75rem 0 0">Updates as you score controls and complete intake.</p>
+                </div>
+                <div class="card">
+                    <div class="label" style="margin-bottom:0.5rem">Try asking</div>
+                    <p style="font-size:0.85rem;color:var(--dim);margin:0">What should we fix first? What are our biggest gaps? How exposed are we on travel? What relates to staff access?</p>
+                </div>
+                <button type="button" class="btn btn-danger" id="assistant-clear" style="width:100%">Clear conversation</button>
+            </aside>
+        </div>
+    </section>
+
+    <!-- DATA -->
+    <section data-view="data" class="hidden">
+        <div class="hero">
+            <div class="estate-label">TargetProof · Data Sovereignty</div>
+            <h1 class="serif">Your Data</h1>
+            <p>Export, back up, and restore your model. You own every file.</p>
+        </div>
+
+        <div class="card">
+            <div class="label">Export</div>
+            <p style="color:var(--dim);font-size:0.9rem">Download a backup to your secure storage or family office drive. Encrypted exports (.sanctuary.json) are recommended.</p>
+            <div class="btn-row">
+                <button class="btn btn-primary" id="btn-export">Download Backup</button>
+                <button class="btn" id="btn-print">Print / Save as PDF</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="label">Import</div>
+            <p style="color:var(--dim);font-size:0.9rem">Restore from a previous backup on this or another machine running the same app.</p>
+            <div class="btn-row">
+                <label class="btn" style="cursor:pointer">
+                    Restore from Backup
+                    <input type="file" id="import-file" accept=".json,.sanctuary.json,application/json" style="display:none">
+                </label>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="label">Vault</div>
+            <p style="color:var(--dim);font-size:0.9rem;margin:0 0 1rem">
+                Your assessment is encrypted with the vault password you created. Lock when you step away —
+                the password is required again on this browser. TargetProof cannot recover a lost password.
+            </p>
+            <button type="button" class="btn" id="btn-lock-vault">Lock model</button>
+        </div>
+
+        <div class="card edition-picker-only">
+            <div class="label">Edition</div>
+            <p style="color:var(--dim);font-size:0.9rem;margin:0 0 1rem">
+                Current: <strong id="data-edition-label" style="color:var(--cream)">—</strong>
+            </p>
+            <p style="color:var(--muted);font-size:0.85rem;margin:0 0 1rem">
+                Standard, AI, and Connected share the same assessment data. Changing edition adjusts Assistant and Knowledge features only.
+            </p>
+            <a href="setup.html?change=1" class="btn">Change edition…</a>
+        </div>
+
+        <div class="card">
+            <div class="label">Storage</div>
+            <p style="color:var(--dim);font-size:0.9rem;margin:0">
+                Data is stored in this browser's local storage on this computer only.
+                Clearing browser data will erase it - keep regular exports.
+            </p>
+            <div id="save-indicator"></div>
+        </div>
+    </section>
+</main>
+
+<footer class="no-print">
+    <div class="footer-inner">
+        <div class="footer-tagline">
+            <img src="assets/brand/tp-icon-dk.png" alt="">
+            Discretion is not a feature. It is the foundation.
+        </div>
+        <div class="footer-meta standard-only">TargetProof Model · v1.5 · Standard</div>
+        <div class="footer-meta ai-only">TargetProof Model · v1.5 · AI</div>
+        <div class="footer-meta connected-only">TargetProof Model · v1.5 · Connected</div>
+    </div>
+</footer>
+
+<script src="framework.js"></script>
+<script src="catalog.js"></script>
+<script src="services.js"></script>
+<script src="knowledge.js"></script>
+<script src="assistant.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

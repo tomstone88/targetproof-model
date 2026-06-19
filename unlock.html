@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'">
+    <title>Unlock · TargetProof Model</title>
+    <link rel="icon" href="assets/brand/favicon.ico">
+    <script src="config.js"></script>
+    <script src="vault.js"></script>
+    <script src="unlock-page.js" defer></script>
+    <style>
+        :root {
+            --bg: #0a0c14;
+            --card: #141a25;
+            --border: #22283a;
+            --gold: #c5a26f;
+            --text: #e8e0d1;
+            --muted: #8a7f68;
+            --dim: #c5b8a0;
+            --err: #fca5a5;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            background-image: linear-gradient(rgba(10, 12, 20, 0.82), rgba(10, 12, 20, 0.92)), url('assets/brand/bg-hurricane-aerial.jpg');
+            background-size: cover; background-attachment: fixed;
+            color: var(--text); line-height: 1.5;
+            display: flex; align-items: center; justify-content: center;
+            padding: 2rem 1.25rem;
+        }
+        .panel {
+            width: 100%; max-width: 420px;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 1.25rem; padding: 2rem;
+        }
+        .brand { text-align: center; margin-bottom: 1.5rem; }
+        .brand img { height: 2.25rem; margin-bottom: 0.75rem; }
+        .label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+        h1 { font-family: Georgia, serif; font-size: 1.65rem; color: white; margin: 0.35rem 0 0.5rem; font-weight: 600; }
+        .sub { color: var(--dim); font-size: 0.95rem; margin: 0 0 1.5rem; }
+        .field { margin-bottom: 1rem; }
+        .field label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 0.35rem; letter-spacing: 0.5px; }
+        input[type="password"], input[type="text"] {
+            width: 100%; padding: 0.65rem 0.85rem; border-radius: 0.5rem;
+            border: 1px solid var(--border); background: var(--bg); color: white;
+            font-size: 1rem; font-family: inherit;
+        }
+        input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+        .btn {
+            width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: none;
+            background: var(--gold); color: #0f0d0b; font-weight: 600;
+            font-size: 0.95rem; cursor: pointer; font-family: inherit; margin-top: 0.5rem;
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-ghost {
+            background: transparent; color: var(--muted); border: 1px solid var(--border);
+            font-weight: 400; margin-top: 0.75rem;
+        }
+        .error { color: var(--err); font-size: 0.85rem; margin: 0.75rem 0 0; min-height: 1.25rem; }
+        .notice {
+            font-size: 0.8rem; color: var(--muted); margin-top: 1.25rem;
+            padding-top: 1.25rem; border-top: 1px solid var(--border); line-height: 1.55;
+        }
+        .hidden { display: none !important; }
+        .hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.35rem; }
+    </style>
+</head>
+<body>
+<div class="panel">
+    <div class="brand">
+        <img src="assets/brand/TP_Main_light_LRG.png" alt="TargetProof">
+        <div class="label">TargetProof Model</div>
+    </div>
+
+    <div id="create-view">
+        <h1>Create your vault password</h1>
+        <p class="sub">Before anything else runs, protect this model on your devices. Only someone with this password can open the assessment.</p>
+        <form id="create-form">
+            <div class="field">
+                <label for="create-pass">Password</label>
+                <input type="password" id="create-pass" autocomplete="new-password" minlength="14" required>
+                <div class="hint">At least 14 characters. Use a phrase your household can recall — there is no reset without erasing data.</div>
+            </div>
+            <div class="field">
+                <label for="create-confirm">Confirm password</label>
+                <input type="password" id="create-confirm" autocomplete="new-password" minlength="14" required>
+            </div>
+            <button type="submit" class="btn" id="create-btn">Create vault &amp; continue</button>
+            <p class="error" id="create-error"></p>
+        </form>
+    </div>
+
+    <div id="unlock-view" class="hidden">
+        <h1>Unlock your model</h1>
+        <p class="sub">Enter the vault password for this household's TargetProof Model.</p>
+        <form id="unlock-form">
+            <div class="field">
+                <label for="unlock-pass">Password</label>
+                <input type="password" id="unlock-pass" autocomplete="current-password" required autofocus>
+            </div>
+            <button type="submit" class="btn" id="unlock-btn">Unlock</button>
+            <p class="error" id="unlock-error"></p>
+        </form>
+        <button type="button" class="btn btn-ghost" id="forgot-btn">Forgot password — erase and start over</button>
+    </div>
+
+    <p class="notice">
+        <strong>What this protects:</strong> Your assessment data is encrypted in this browser. Without the password, the model cannot be opened on this machine.
+        <br><br>
+        <strong>What it does not do:</strong> Someone with physical access to the USB files could still copy the drive. The vault stops casual use and keeps household data encrypted at rest in the browser.
+        <br><br>
+        TargetProof keeps no copy of your password or assessment.
+    </p>
+</div>
+</body>
+</html>

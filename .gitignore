@@ -1,0 +1,12 @@
+# Local / dev only
+models/
+vendor/
+tools/
+terminals/
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# USB packaging scratch
+dist/
