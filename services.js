@@ -49,7 +49,7 @@ const SANCTUARY_SERVICES = {
       "tagline": "One day onsite. A complete picture of your family's risk — and a living model you keep.",
       "duration": "One day onsite assessment",
       "hero": "The Sanctuary Gap Assessment scores 156 controls across people, institutions, and lifestyle — then leaves you with a private model and a prioritized path forward.",
-      "description": "Thomas Stone leads a focused one-day onsite engagement. Together you walk your residence and family office context the way an adversary would — physical, digital, and human. Every control is scored. Gaps are tallied. Recommendations tie directly to remediation offerings you can execute on your timeline.\n\nYou keep the Sanctuary Model on your own systems. TargetProof keeps no copy. What remains is clarity: where you are exposed, what matters most, and exactly how to close it.",
+      "description": "A principal-led, one-day onsite engagement. Together you walk your residence and family office context the way an adversary would — physical, digital, and human. Every control is scored. Gaps are tallied. Recommendations tie directly to remediation offerings you can execute on your timeline.\n\nYou keep the Sanctuary Model on your own systems. TargetProof keeps no copy. What remains is clarity: where you are exposed, what matters most, and exactly how to close it.",
       "includes": [
         "156-control Sanctuary Framework assessment (Govern → Recover)",
         "Onsite probes across primary residence and agreed scope",
@@ -93,7 +93,7 @@ const SANCTUARY_SERVICES = {
       "tagline": "Who can reach what — and how that access is granted, limited, and revoked.",
       "duration": "1–2 day onsite + remote follow-through",
       "hero": "MFA, password architecture, privileged credentials, and staff access lifecycle — implemented without breaking how your household actually works.",
-      "description": "Identity is the highest-leverage control in UHNWI environments. We deploy hardware-key or passkey MFA on principal accounts, architect your password manager vaults, segment privileged estate credentials, and establish staff on/offboarding discipline.\n\nWire verification rituals and encrypted communications for sensitive family office workflows are included where gaps exist.",
+      "description": "Identity is the highest-leverage control in household and family office environments. We deploy hardware-key or passkey MFA on principal accounts, architect your password manager vaults, segment privileged estate credentials, and establish staff on/offboarding discipline.\n\nWire verification rituals and encrypted communications for sensitive family office workflows are included where gaps exist.",
       "includes": [
         "MFA rollout on principal and financial accounts",
         "Enterprise password manager deployment",

@@ -1,4 +1,6 @@
 # Local / dev only
+node_modules/
+package-lock.json
 models/
 vendor/
 tools/
