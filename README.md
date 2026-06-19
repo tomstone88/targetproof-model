@@ -1,6 +1,14 @@
 # Sanctuary Model
 
-**Standard Edition** — the private USB deliverable from the [Family Threat Model](https://www.targetproof.com/model/) engagement. Households and family offices map protection posture across people, institutions, and lifestyle using the 156-control Sanctuary Framework (NIST CSF 2.0: Govern → Recover). Everything runs on your devices. No cloud. No AI in this edition.
+<p align="center">
+  <a href="https://www.targetproof.com/model/">
+    <img src="assets/ftmodel-cover.png" alt="Family Threat Model — Overview screen with the Sanctuary Loop" width="920">
+  </a>
+</p>
+
+<p align="center"><em>Illustrative view — your household's model runs locally on your devices. TargetProof keeps no copy.</em></p>
+
+**Standard Edition** — the on-device deliverable from the [Family Threat Model](https://www.targetproof.com/model/) engagement. Households and family offices map protection posture across people, institutions, and lifestyle using the 156-control Sanctuary Framework (NIST CSF 2.0: Govern → Recover). Everything runs on your devices. No cloud. No AI in this edition.
 
 > **Discretion is not a feature. It is the foundation.**
 
