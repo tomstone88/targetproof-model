@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'">
+    <title>Choose Your Edition · Sanctuary Model</title>
+    <link rel="icon" href="assets/brand/favicon.ico">
+    <script src="vault.js"></script>
+    <script src="edition.js"></script>
+    <script src="setup-page.js" defer></script>
+    <style>
+        :root {
+            --bg: #0a0c14;
+            --card: #141a25;
+            --border: #22283a;
+            --gold: #c5a26f;
+            --text: #e8e0d1;
+            --muted: #8a7f68;
+            --dim: #c5b8a0;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            background-image: linear-gradient(rgba(10, 12, 20, 0.82), rgba(10, 12, 20, 0.92)), url('assets/brand/bg-hurricane-aerial.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            color: var(--text);
+            line-height: 1.5;
+        }
+        .serif { font-family: Georgia, 'Times New Roman', serif; }
+        .label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+        .wrap { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem 3rem; }
+        .brand { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+        .brand img { height: 2.5rem; width: auto; }
+        h1 { font-size: clamp(1.75rem, 4vw, 2.5rem); color: white; margin: 0.5rem 0 1rem; font-weight: 600; }
+        .lead { color: var(--dim); max-width: 42rem; margin: 0 0 1.5rem; font-size: 1.05rem; }
+        .banner {
+            background: #111622; border: 1px solid var(--border); border-left: 3px solid var(--gold);
+            border-radius: 0.75rem; padding: 1rem 1.25rem; margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--dim);
+        }
+        .banner.warn { border-left-color: #eab308; color: #fde047; background: #1a1810; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin: 2rem 0; }
+        .card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 1rem;
+            padding: 1.5rem; display: flex; flex-direction: column;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .card:hover { border-color: #3d4a66; }
+        .card.featured { border-color: var(--gold); }
+        .card.disabled { opacity: 0.55; pointer-events: none; }
+        .card h2 { font-size: 1.25rem; color: white; margin: 0.5rem 0; font-weight: 600; }
+        .tagline { color: var(--dim); font-size: 0.95rem; margin: 0 0 1rem; flex-grow: 1; }
+        ul.features { list-style: none; padding: 0; margin: 0 0 1.25rem; font-size: 0.85rem; color: var(--muted); }
+        ul.features li { padding: 0.35rem 0; padding-left: 1rem; position: relative; }
+        ul.features li::before { content: '·'; color: var(--gold); position: absolute; left: 0; font-weight: bold; }
+        .badge { display: inline-block; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase;
+            padding: 0.2rem 0.5rem; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); margin-bottom: 0.5rem; }
+        .badge.ok { border-color: #22c55e; color: #86efac; }
+        .badge.warn { border-color: #eab308; color: #fde047; }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 0.65rem 1.25rem; border-radius: 0.5rem; border: 1px solid var(--border);
+            background: var(--bg); color: var(--dim); font-size: 0.9rem; cursor: pointer; text-decoration: none;
+            font-family: inherit; width: 100%;
+        }
+        .btn-primary { background: var(--gold); color: #0f0d0b; border-color: var(--gold); font-weight: 600; }
+        .btn-primary:hover { filter: brightness(1.08); }
+        .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+        .footer { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+            font-size: 0.8rem; color: var(--muted); text-align: center; }
+        .footer strong { color: var(--dim); }
+        .continue-row { margin-bottom: 1rem; text-align: center; }
+        .platform-hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem; }
+        code { font-size: 0.85em; color: var(--gold); }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="brand">
+        <img src="assets/brand/TP_Main_light_LRG.png" alt="TargetProof">
+        <div>
+            <div class="label">Sanctuary Model · First Launch</div>
+            <div style="font-size:0.85rem;color:var(--muted)">The Family Threat Model — on your devices</div>
+        </div>
+    </div>
+
+    <h1 class="serif">How should your Sanctuary Model run<br>on this device?</h1>
+    <p class="lead">Your vault is secured. Choose Standard, AI, or Connected — all editions share the same 156 controls and threat spectrum. TargetProof keeps no copy. Change edition later under <strong>Your Data</strong>.</p>
+
+    <div id="protocol-banner" class="banner warn hidden"></div>
+    <div id="ai-banner" class="banner hidden"></div>
+
+    <div id="continue-row" class="continue-row hidden">
+        <a id="continue-link" href="index.html" class="btn btn-ghost" style="width:auto;display:inline-flex">Continue with current edition →</a>
+    </div>
+
+    <div class="grid">
+        <div class="card" data-edition="standard">
+            <span class="badge ok">Maximum discretion</span>
+            <div class="label">Edition 1</div>
+            <h2 class="serif">Standard</h2>
+            <p class="tagline">Structured answers from your scored model — no language model, no external AI, no cloud. Built for households documenting sensitive details with zero AI surface area.</p>
+            <ul class="features">
+                <li>156-control Sanctuary Framework &amp; Sanctuary Loop</li>
+                <li>Guided Assistant (no LLM)</li>
+                <li>Works fully offline after launch</li>
+                <li>Recommended for counsel-driven households</li>
+            </ul>
+            <button type="button" class="btn btn-primary" data-select="standard">Use Standard Edition</button>
+        </div>
+
+        <div class="card" data-edition="ai">
+            <span class="badge" id="ai-badge">On-device AI</span>
+            <div class="label">Edition 2</div>
+            <h2 class="serif">AI</h2>
+            <p class="tagline">On-device assistant for conversational questions about your gaps and priorities. Fully offline — your data never leaves this device. Offered when the household wants it — never required.</p>
+            <ul class="features">
+                <li>Everything in Standard</li>
+                <li>On-device Llama assistant (WebGPU)</li>
+                <li>Conversational gap &amp; priority questions</li>
+                <li>Requires Chrome or Edge + local launcher</li>
+            </ul>
+            <button type="button" class="btn btn-primary" data-select="ai">Use AI Edition</button>
+        </div>
+
+        <div class="card featured" data-edition="connected">
+            <span class="badge" id="connected-badge">AI + live context</span>
+            <div class="label">Edition 3</div>
+            <h2 class="serif">Connected</h2>
+            <p class="tagline">Everything in AI Edition, plus live knowledge — calendar today; email and phone planned. Facts enter the model only after you confirm them. Built for Sanctuary Stewardship.</p>
+            <ul class="features">
+                <li>Everything in AI Edition</li>
+                <li>Knowledge tab &amp; calendar (.ics) import</li>
+                <li>Feeds Spectrum, Summary &amp; Assistant</li>
+                <li>Built for Sanctuary Stewardship retainers</li>
+            </ul>
+            <button type="button" class="btn btn-primary" data-select="connected">Use Connected Edition</button>
+        </div>
+    </div>
+
+    <div class="banner">
+        <strong>Plug in on any system.</strong> Windows: double-click <code>START.bat</code> ·
+        Mac: <code>START.command</code> · Linux / Unix: <code>start.sh</code> (or run in Terminal).
+        A small local server opens the vault screen, then setup, then your model.
+    </div>
+
+    <div class="footer">
+        <div>© TargetProof, LLC · Discretion is not a feature. It is the foundation.</div>
+        <div class="platform-hint" id="platform-hint"></div>
+    </div>
+</div>
+</body>
+</html>

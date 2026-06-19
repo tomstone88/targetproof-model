@@ -1,5 +1,5 @@
 @echo off
-title TargetProof Model
+title Sanctuary Model
 cd /d "%~dp0"
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0start.ps1"
 exit /b %ERRORLEVEL%

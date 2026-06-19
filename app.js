@@ -203,10 +203,8 @@
             const active = activeNav && q.nav === activeNav ? ' active-phase' : '';
             const navAttr = clickable && q.nav ? ' data-loop-nav="' + q.nav + '" role="button" tabindex="0"' : '';
             return '<div class="loop-card' + active + (clickable ? ' loop-card--clickable' : '') + '"' + navAttr + '>' +
-                '<div class="loop-card-head">' +
-                '<span class="loop-num">Q' + (i + 1) + '</span>' +
-                '<div><div class="loop-phase">' + q.phase + '</div>' +
-                '<div class="loop-title">' + q.question + '</div></div></div>' +
+                '<div class="loop-q">Q' + (i + 1) + ' · ' + q.phase + '</div>' +
+                '<div class="loop-title">' + q.question + '</div>' +
                 '<p class="loop-desc">' + q.summary + '</p></div>';
         }).join('');
         if (clickable) {
@@ -1104,9 +1102,7 @@
         const name = model.meta.clientName.trim();
         const hero = document.getElementById('page-title');
         const nav = document.getElementById('nav-household');
-        const profileName = document.getElementById('profile-display-name');
-        if (hero) hero.textContent = name || 'Your Security Model';
-        if (profileName) profileName.textContent = name || 'Your household';
+        if (hero) hero.textContent = name || 'Your Sanctuary Model';
         if (nav) {
             if (name) {
                 nav.textContent = name;
@@ -1116,7 +1112,7 @@
                 nav.classList.add('is-placeholder');
             }
         }
-        document.title = name ? (name + ' · TargetProof Model') : 'TargetProof Model';
+        document.title = name ? (name + ' · Sanctuary Model') : 'Sanctuary Model · TargetProof';
     }
 
     function renderToc() {

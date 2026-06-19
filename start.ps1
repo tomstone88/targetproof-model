@@ -110,7 +110,7 @@ if (-not $started) {
 
 $url = "http://127.0.0.1:$Port/unlock.html"
 Write-Host ""
-Write-Host "  TargetProof Model" -ForegroundColor Yellow
+Write-Host "  Sanctuary Model · TargetProof" -ForegroundColor Yellow
 Write-Host "  Serving from: $Root" -ForegroundColor DarkGray
 Write-Host "  Open: $url" -ForegroundColor Cyan
 Write-Host ""

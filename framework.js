@@ -9,7 +9,7 @@ const SANCTUARY_FRAMEWORK = {
     version: '1.0',
     methodology: {
         name: 'Sanctuary Loop',
-        tagline: 'Measure twice. Prioritize by business impact. Improve without growing the model.',
+        tagline: 'Four questions. One integrated picture — from household context through scored controls to a plan you can actually execute.',
         principles: [
             'Business context before controls — who decides, what is at stake, what must not break.',
             'Residual risk is explicit — gaps can be accepted knowingly, not accidentally.',

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'">
-    <title>TargetProof Model</title>
+    <title>Sanctuary Model · TargetProof</title>
     <link rel="icon" href="assets/brand/favicon.ico">
     <script src="vault.js"></script>
     <script src="edition.js"></script>
@@ -44,9 +44,19 @@
         .stat-sep { margin: 0 0.35rem; opacity: 0.5; }
         .gap-stat { color: #fca5a5; }
 
+        main { max-width: 1200px; margin: 0 auto; padding: 6.75rem 1.5rem 3rem; }
+        @media (max-width: 960px) { main { padding-top: 7.5rem; } }
+
         .hero { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
         .hero h1 { font-size: 2.25rem; font-weight: 600; color: white; margin: 0.5rem 0; }
         .hero p { color: var(--dim); max-width: 40rem; margin: 0; }
+
+        .privacy-banner {
+            background: #111622; border: 1px solid var(--border);
+            border-left: 3px solid var(--gold);
+            border-radius: 0.75rem; padding: 1rem 1.25rem; margin-bottom: 1.5rem;
+            font-size: 0.9rem; color: var(--dim);
+        }
         .handoff-banner {
             background: #0f1f17; border: 1px solid #166534;
             border-radius: 0.75rem; padding: 1rem 1.25rem; margin-bottom: 1.5rem;
@@ -242,9 +252,15 @@
         .knowledge-source h3 { font-size: 0.95rem; color: white; margin: 0.35rem 0; }
         .knowledge-source p { font-size: 0.8rem; color: var(--muted); margin: 0; }
 
-        .loop-card--clickable { cursor: pointer; transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; }
-        .loop-card--clickable:hover { transform: translateY(-3px); }
+        .loop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+        .loop-card { background: var(--bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; }
+        .loop-card.active-phase { border-color: var(--gold); }
+        .loop-card--clickable { cursor: pointer; transition: border-color 0.2s, transform 0.2s; }
+        .loop-card--clickable:hover { border-color: var(--gold); transform: translateY(-2px); }
         .loop-card--clickable:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+        .loop-q { font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.35rem; }
+        .loop-title { font-size: 0.95rem; color: white; margin-bottom: 0.35rem; }
+        .loop-desc { font-size: 0.8rem; color: var(--muted); margin: 0; }
         .nist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; }
         .nist-card { background: var(--bg); border: 1px solid var(--border); border-radius: 0.65rem; padding: 0.85rem; }
         .nist-code { font-family: var(--mono); color: var(--gold); font-size: 0.75rem; }
@@ -275,7 +291,7 @@
     <div class="header-inner">
         <div class="brand-lockup">
             <img src="assets/brand/TP_Main_light_LRG.png" alt="TargetProof">
-            <span class="brand-wordmark">TargetProof <em>Model</em></span>
+            <span class="brand-wordmark">Family <em>Threat Model</em></span>
         </div>
         <nav class="portal-nav" aria-label="Model sections">
             <button class="nav-link nav-active" data-nav="setup" type="button">
@@ -334,30 +350,26 @@
 <main>
     <!-- SETUP -->
     <section data-view="setup">
-        <div class="hero hero-premium">
-            <div class="hero-badge">Diamond Tier</div>
-            <h1 class="hero-title serif" id="page-title">Your Security Model</h1>
-            <p class="hero-lead">A private family protection posture — mapped across people, institutions, and lifestyle. Discreet, on-device, and yours alone.</p>
+        <div class="hero">
+            <div class="estate-label">TargetProof Ultra · Sanctuary Framework</div>
+            <h1 class="serif" id="page-title">Your Sanctuary Model</h1>
+            <p>One complete picture of your household's protection posture — across people, institutions, and lifestyle. You keep a private, living model on your own systems. TargetProof keeps no copy of your assessment.</p>
         </div>
+        <div class="label" style="margin-bottom:0.35rem">The Sanctuary Loop</div>
+        <p style="color:var(--dim);font-size:0.9rem;margin:0 0 1rem;max-width:42rem">Four questions. One integrated picture — from household context through scored controls to a plan you can actually execute.</p>
         <div id="setup-loop" class="loop-grid no-print"></div>
 
         <div class="privacy-banner">
-            <strong>Your data stays yours.</strong> Assessment data is stored locally on this computer — TargetProof keeps no copy.
-            The app does not sync or transmit your model. Optional remediation links open targetproof.com only when you choose to follow them.
-            Export encrypted backups to a location you control.
+            <strong>Your data stays yours.</strong> The Sanctuary Model runs entirely on your devices. Assessment data is encrypted in this browser — TargetProof keeps no copy and nothing syncs to the cloud.
+            Remediation links on the Recommendations tab open targetproof.com only when you choose to follow them. Export encrypted backups to a location you control.
         </div>
 
-        <div class="card profile-card">
-            <div class="profile-card-header">
-                <div>
-                    <div class="label">Household Profile</div>
-                    <h2 class="profile-card-title" id="profile-display-name">Your household</h2>
-                </div>
-            </div>
+        <div class="card">
+            <div class="label" style="margin-bottom:1rem">Household Profile</div>
             <div class="grid-2">
                 <div>
                     <label class="label">Family / Household Name</label>
-                    <input type="text" id="client-name" placeholder="e.g. Stone">
+                    <input type="text" id="client-name" placeholder="Your household">
                 </div>
                 <div>
                     <label class="label">Properties in Scope</label>
@@ -372,16 +384,16 @@
                     <input type="date" id="handoff-date" title="Date this model was last reviewed">
                 </div>
             </div>
-            <p class="profile-hint">Your family office or designated owner keeps this model current. All fields save automatically.</p>
+            <p style="font-size:0.8rem;color:var(--muted);margin:1rem 0 0">Your family office or designated owner keeps this model current. All fields save automatically.</p>
         </div>
     </section>
 
     <!-- INTAKE -->
     <section data-view="intake" class="hidden">
         <div class="hero">
-            <div class="estate-label">TargetProof · Intake</div>
-            <h1 class="serif">Pre-Assessment Intake</h1>
-            <p>Capture context before or during the onsite assessment. Auto-saves as you type.</p>
+            <div class="estate-label">Sanctuary Loop · Intake</div>
+            <h1 class="serif">What Are We Protecting?</h1>
+            <p>Structured intake: properties, participants, advisors, travel, incidents, and goals. Business context before controls — scoped to your household, not a generic checklist.</p>
         </div>
         <div id="intake-list"></div>
     </section>
@@ -389,14 +401,14 @@
     <!-- SPECTRUM -->
     <section data-view="spectrum" class="hidden">
         <div class="hero">
-            <div class="estate-label">TargetProof · Threat Spectrum</div>
-            <h1 class="serif">What Can Go Wrong</h1>
-            <p>Synthesized UHNWI targeting patterns, FTC fraud warnings, and NIST CSF 2.0 — mapped to your controls. Highlights patterns that match your intake.</p>
+            <div class="estate-label">Sanctuary Loop · Threat Spectrum</div>
+            <h1 class="serif">What Can Go Wrong?</h1>
+            <p>156 controls scored across Govern → Recover (NIST CSF 2.0), plus documented UHNWI targeting patterns and regulator-aligned fraud warnings — mapped to your intake.</p>
         </div>
         <div id="spectrum-loop" class="loop-grid no-print"></div>
         <div class="card">
             <div class="label" style="margin-bottom:0.75rem">NIST Cybersecurity Framework 2.0</div>
-            <p style="font-size:0.85rem;color:var(--dim);margin:0 0 1rem">Your 156 controls align to Govern → Recover. Each function below shows how the TargetProof Model applies CSF outcomes to households — not enterprise software alone.</p>
+            <p style="font-size:0.85rem;color:var(--dim);margin:0 0 1rem">Govern, Identify, Protect, Detect, Respond, Recover — translated for estates and family offices, not enterprise software alone.</p>
             <div id="nist-grid" class="nist-grid"></div>
         </div>
         <div class="card" style="margin-top:1rem">
@@ -419,7 +431,7 @@
     <!-- CHECKLIST -->
     <section data-view="checklist" class="hidden">
         <div class="hero">
-            <div class="estate-label">TargetProof · 156 Controls</div>
+            <div class="estate-label">Sanctuary Framework · 156 Controls</div>
             <h1 class="serif">Controls Checklist</h1>
             <p>Mark each control: <span style="color:#86efac">In Place</span> · <span style="color:#fde047">Partial</span> · <span style="color:#fca5a5">Gap</span> · <span style="color:#9ca3af">N/A</span></p>
         </div>
@@ -450,9 +462,9 @@
     <!-- RECOMMENDATIONS -->
     <section data-view="recommendations" class="hidden">
         <div class="hero">
-            <div class="estate-label">TargetProof · Recommendations</div>
-            <h1 class="serif">Your Recommendations</h1>
-            <p>Gaps tallied from your control scores, mapped to TargetProof remediation services. Your model stays private — links open the website when you want to learn more.</p>
+            <div class="estate-label">Sanctuary · Remediation</div>
+            <h1 class="serif">Every Gap Has a Path Forward</h1>
+            <p>Gaps tallied and prioritized, linked to Sanctuary remediation services when you are ready to act. Your model stays private — links open the website only when you choose.</p>
         </div>
         <div id="rec-summary" style="margin-bottom:1.5rem"></div>
         <div id="recommendations-list"></div>
@@ -461,9 +473,9 @@
     <!-- SUMMARY -->
     <section data-view="summary" class="hidden">
         <div class="hero">
-            <div class="estate-label">TargetProof · Assessment Report</div>
-            <h1 class="serif">Summary & Findings</h1>
-            <p>Live dashboard from your control scores. Generate a draft report, then refine each section.</p>
+            <div class="estate-label">Sanctuary Loop · Roadmap</div>
+            <h1 class="serif">What Will We Do About It?</h1>
+            <p>Live maturity dashboard, gap tally, and risk-ordered findings. Generate a draft report and 30 / 90 / 180-day roadmap, then refine each section.</p>
         </div>
         <div id="summary-stale-banner" class="stale-banner hidden no-print"></div>
         <div id="summary-dashboard"></div>
@@ -537,9 +549,9 @@
     <!-- REVIEW -->
     <section data-view="review" class="hidden">
         <div class="hero">
-            <div class="estate-label">TargetProof · Assessment Review</div>
+            <div class="estate-label">Sanctuary Loop · Review</div>
             <h1 class="serif">Did We Do a Good Enough Job?</h1>
-            <p>Close the loop: effectiveness, residual risk acceptance, and what to improve next cycle — without expanding the model.</p>
+            <p>Built-in review: effectiveness, explicit residual-risk acceptance, and what to improve next cycle. The framework sharpens over time — without the deliverable growing heavier.</p>
         </div>
         <div id="review-loop" class="loop-grid no-print"></div>
         <div id="review-dashboard" class="stat-grid" style="margin-bottom:1rem"></div>
@@ -578,7 +590,7 @@
     <!-- KNOWLEDGE (Connected Edition) -->
     <section data-view="knowledge" class="hidden connected-only">
         <div class="hero">
-            <div class="estate-label">TargetProof · Live Knowledge</div>
+            <div class="estate-label">Sanctuary · Live Knowledge</div>
             <h1 class="serif">Household Context</h1>
             <p>Calendar, network inventory, email, and phone — summarized locally, confirmed by you, then fed into Spectrum, Summary, and Assistant. AI Edition capabilities included.</p>
         </div>
@@ -625,10 +637,10 @@
     <!-- ASSISTANT -->
     <section data-view="assistant" class="hidden">
         <div class="hero">
-            <div class="estate-label">TargetProof · Private Assistant</div>
+            <div class="estate-label">Sanctuary · Assistant</div>
             <h1 class="serif">Model Assistant</h1>
-            <p class="standard-only">Ask security questions informed by your household model. Guided analysis only — no AI, no external services.</p>
-            <p class="ai-only">Ask security questions informed by your household model. Runs entirely on this device — your data never leaves the USB.</p>
+            <p class="standard-only">Structured answers from your scored model — no language model, no external AI, no cloud.</p>
+            <p class="ai-only">Conversational questions about your gaps and priorities. Fully offline — your data never leaves this device.</p>
         </div>
         <div class="privacy-banner standard-only">
             <strong>Guided assistant — no AI.</strong> The assistant reads your intake, control scores, and summary using structured, rule-based analysis.
@@ -681,9 +693,9 @@
     <!-- DATA -->
     <section data-view="data" class="hidden">
         <div class="hero">
-            <div class="estate-label">TargetProof · Data Sovereignty</div>
+            <div class="estate-label">Sanctuary · Your Data</div>
             <h1 class="serif">Your Data</h1>
-            <p>Export, back up, and restore your model. You own every file.</p>
+            <p>Export, back up, and restore your Sanctuary Model. You own every file.</p>
         </div>
 
         <div class="card">
@@ -743,9 +755,9 @@
             <img src="assets/brand/tp-icon-dk.png" alt="">
             Discretion is not a feature. It is the foundation.
         </div>
-        <div class="footer-meta standard-only">TargetProof Model · v1.5 · Standard</div>
-        <div class="footer-meta ai-only">TargetProof Model · v1.5 · AI</div>
-        <div class="footer-meta connected-only">TargetProof Model · v1.5 · Connected</div>
+        <div class="footer-meta standard-only">Sanctuary Model · v1.5 · Standard Edition</div>
+        <div class="footer-meta ai-only">Sanctuary Model · v1.5 · AI Edition</div>
+        <div class="footer-meta connected-only">Sanctuary Model · v1.5 · Connected Edition</div>
     </div>
 </footer>
 

@@ -16,7 +16,7 @@ open_browser() {
 }
 
 echo ""
-echo "  TargetProof Sanctuary Model"
+echo "  Sanctuary Model · TargetProof"
 echo "  Serving from: $(pwd)"
 echo "  Open: $URL"
 echo ""

@@ -8,9 +8,9 @@
     const VALID = ['standard', 'ai', 'connected'];
 
     const LABELS = {
-        standard: 'TargetProof Model · Standard',
-        ai: 'TargetProof Model · AI',
-        connected: 'TargetProof Model · Connected'
+        standard: 'Sanctuary Model · Standard Edition',
+        ai: 'Sanctuary Model · AI Edition',
+        connected: 'Sanctuary Model · Connected Edition'
     };
 
     function usesVault() {
