@@ -12,6 +12,16 @@
 
 > **Discretion is not a feature. It is the foundation.**
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-c5a26f.svg)](LICENSE)
+
+---
+
+## License
+
+Released under the **[MIT License](LICENSE)**. You may use, modify, and distribute this software — including for **commercial purposes** — without royalties or compensation to TargetProof. Keep the copyright notice and license text with any copy you redistribute.
+
+**[Read the full disclaimer](DISCLAIMER.md)** before using this tool with clients or sensitive household data. The software is provided as-is, with no warranty and no guarantee of security outcomes.
+
 ---
 
 ## Who this is for
@@ -104,4 +114,6 @@ The guided assistant answers from your scored intake, controls, and summary usin
 
 ---
 
-**v1.5** — Sanctuary Model · Standard Edition · TargetProof Ultra
+**v1.5** — Sanctuary Model · Standard Edition · [TargetProof](https://www.targetproof.com/model/)
+
+Questions or practitioner inquiries: [hello@targetproof.com](mailto:hello@targetproof.com)
