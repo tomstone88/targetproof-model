@@ -12,3 +12,12 @@ desktop.ini
 
 # USB packaging scratch
 dist/
+# Premium / platform — never commit to public Standard Edition repo
+knowledge.js
+llm.js
+assistant-llm.js
+README.ai.txt
+README.connected.txt
+download-model.ps1
+prepare-usb.ps1
+publish-standard.ps1

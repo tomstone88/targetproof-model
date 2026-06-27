@@ -32,6 +32,8 @@ Released under the **[MIT License](LICENSE)**. You may use, modify, and distribu
 
 This repository ships the **Standard Edition only**: guided Assistant (rule-based, no language model), full control catalog, intake, threat spectrum, recommendations, and encrypted local storage.
 
+**AI Edition, Connected Edition, and fiduciary export integrations** are not in this repo — they ship through [TargetProof](https://www.targetproof.com/model/) engagements and stewardship programs.
+
 ---
 
 ## Quick start

@@ -311,12 +311,18 @@
     }
 
     function getEdition() {
+        if (window.TARGETPROOF_MODEL && window.TARGETPROOF_MODEL.standardOnly) {
+            return 'standard';
+        }
         const valid = ['standard', 'ai', 'connected'];
         const ed = cache && cache.edition;
         return valid.includes(ed) ? ed : null;
     }
 
     async function setEdition(edition) {
+        if (window.TARGETPROOF_MODEL && window.TARGETPROOF_MODEL.standardOnly) {
+            edition = 'standard';
+        }
         const valid = ['standard', 'ai', 'connected'];
         if (!valid.includes(edition)) return false;
         if (!cache) cache = emptyCache();
